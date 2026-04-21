@@ -17,9 +17,11 @@ class Settings(BaseSettings):
 settings = Settings()
 if settings.DATABASE_URL:
     DATABASE_URL = settings.DATABASE_URL
-    # Render may provide postgres://... URL, SQLAlchemy expects postgresql://...
+    # Force psycopg (v3) driver in SQLAlchemy URL to avoid psycopg2 dependency.
     if DATABASE_URL.startswith("postgres://"):
-        DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+        DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+psycopg://", 1)
+    elif DATABASE_URL.startswith("postgresql://"):
+        DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg://", 1)
 else:
     DATABASE_URL = (
         "mysql+pymysql://"
